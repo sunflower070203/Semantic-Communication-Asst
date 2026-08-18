@@ -49,23 +49,26 @@ agent-demo/
 - [ ] **[用户] Step 2: 添加一个脚本代码节点**
   从节点面板拖入"脚本代码"节点，打开其编辑器。**确认编辑器支持的语言（Python / JS / 其他），把语言选项发我。**
 
-- [ ] **[Codex] Step 3: 提供出网测试脚本**（假设 Python；若编辑器是 JS，我随后给 JS 版，测试目标不变）
+- [ ] **[Codex] Step 3: 提供出网测试脚本**（平台脚本节点为 Python，入口 `execute_output(params)`，`params.input` 为输入字符串，返回值即输出）
 
 ```python
 import urllib.request
 import json
 
-def probe(url: str) -> str:
-    try:
-        with urllib.request.urlopen(url, timeout=15) as r:
-            return f"OK {r.status} len={len(r.read())}"
-    except Exception as e:
-        return f"FAIL {type(e).__name__}: {e}"
-
-print(json.dumps({
-    "arxiv": probe("http://export.arxiv.org/api/query?search_query=all:semantic+communication&max_results=1"),
-    "openalex": probe("https://api.openalex.org/works?search=semantic%20communication&per-page=1"),
-}, ensure_ascii=False))
+def execute_output(params):
+    urls = {
+        "arxiv": "http://export.arxiv.org/api/query?search_query=all:semantic+communication&max_results=1",
+        "openalex": "https://api.openalex.org/works?search=semantic%20communication&per-page=1",
+    }
+    out = {}
+    for name, url in urls.items():
+        try:
+            with urllib.request.urlopen(url, timeout=15) as r:
+                body = r.read()
+                out[name] = "OK status=%s len=%d" % (r.status, len(body))
+        except Exception as e:
+            out[name] = "FAIL %s: %s" % (type(e).__name__, e)
+    return json.dumps(out, ensure_ascii=False)
 ```
 
 - [ ] **[用户] Step 4: 运行脚本并回报结果**
@@ -582,6 +585,19 @@ if __name__ == "__main__":
         print(json.dumps({"ok": False, "error": "param_error", "message": f"JSON 解析失败: {e}"}, ensure_ascii=False))
         sys.exit(0)
     print(json.dumps(run(payload), ensure_ascii=False))
+
+
+def execute_output(params):
+    """平台脚本节点入口：params.input 为上游 LLM 输出的 JSON 字符串，返回 JSON 字符串。"""
+    raw = getattr(params, "input", None)
+    if isinstance(raw, str):
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as e:
+            return json.dumps({"ok": False, "error": "param_error", "message": f"JSON 解析失败: {e}"}, ensure_ascii=False)
+    else:
+        payload = raw
+    return json.dumps(run(payload), ensure_ascii=False)
 ```
 
 - [ ] **[Codex] Step 2: 跑测试，确认全部通过**
