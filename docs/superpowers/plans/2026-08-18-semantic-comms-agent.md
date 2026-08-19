@@ -80,6 +80,40 @@ def execute_output(params):
 - [ ] **[Codex] Step 5: 记录结论到 `docs/technical_report.md`（先建文件头）**
   在技术文档里记录出网结论，后续所有设计决策以此为准。
 
+### Task 0.4: 平台能力实测记录（2026-08-19，源码提取）
+
+**Files:**
+- Modify: `docs/superpowers/plans/2026-08-18-semantic-comms-agent.md`（本文件）
+
+- [ ] **[Codex] Step 1: 记录实测能力**
+
+```markdown
+## 平台实测记录（2026-08-19）
+
+### 脚本节点接口（已确认）
+- 语言：Python
+- 入口约定：出参名 = 函数名，如出参 output 对应 `def execute_output(params)`
+- 入参：`params.<入参名>`（如 params.input，字符串）
+- 返回值即出参内容
+- 内置对象：session、request
+- 内置方法：`log(session, title, detail)` 记日志、`thought(session, '内容')` 记思考过程；可操作记忆与知识库
+- 运行方式：语法检查 → 顶栏"保存并运行一次" → 调试结果面板查看；或"对话调试"跑全流程
+
+### 工作流节点类型（源码提取）
+开始节点、大模型任务（LLM，支持 React 思考规划 / functionCall / 流式 / 多模态）、智能体任务、
+工具任务、脚本代码、函数、知识库检索（向量/全文/融合/混合检索）、数据库/SQL 执行器、
+分类模型、选择器（排他路由 if/否则）、迭代器（串行/并行）、聚合器、变量字段、常量、
+结果渲染任务、澄清反馈任务、断点、文本精排模型、记忆库、意图列表、样例库/ICL
+```
+
+- [ ] **[Codex] Step 2: 提交并推送**
+
+```bash
+git add docs/superpowers/plans/2026-08-18-semantic-comms-agent.md
+git commit -m "docs(plan): record platform node inventory and script SDK"
+git push origin main
+```
+
 ### Task 0.2: skillmanage 能力确认
 
 **Files:** 无（平台操作）
