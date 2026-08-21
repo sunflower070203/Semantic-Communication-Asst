@@ -91,6 +91,11 @@ def execute_output(params):
 ```markdown
 ## 平台实测记录（2026-08-19）
 
+### 脚本沙箱能力（2026-08-21 更新，决定性）
+- **脚本沙箱禁止网络访问**：模块白名单仅 re/json/string/math/random/set/frozenset/DateTime/uuid，无任何网络库
+- 官方 FAQ 明确限制 os、requests 等三方库；内置 request 对象只是当前请求 ID，不是 HTTP 客户端
+- 结论：检索不能走脚本节点外网调用，需降级为知识库方案（B）或工具节点方案（A）
+
 ### 脚本节点接口（已确认）
 - 语言：Python
 - 入口约定：出参名 = 函数名，如出参 output 对应 `def execute_output(params)`
