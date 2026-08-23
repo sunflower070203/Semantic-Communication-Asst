@@ -1,6 +1,6 @@
 # 语义通信助手 — 进度恢复文档
 
-> 最后更新：2026-08-23 17:45（Asia/Shanghai）
+> 最后更新：2026-08-23 19:30（Asia/Shanghai）
 > 用途：平台会话中断后，按此文档恢复全部进度。所有关键标识符和待办在此记录。
 
 ## 0. 重大进展（A 路线：角色对话 Agent 已验证可自主运行）
@@ -36,6 +36,23 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 - **auto/new 体验流不可用**：`/agent/auto/new/session/create {template:"AutoBotV2", relationCode}` 报
   "Failed to create the solution"（solutionCode 为空，平台未部署解决方案）。
 - 共享页 UI 输入自动化不稳定：建议用"新开对话"+手动输入，或直接用上面 API + 页面。
+
+### 0.2 8/23 晚：B 路线已修复并验证（语义通信知识问答 RAG 可用）
+- **根因**：流程里的"术语库检索/问答库检索"配置为 NewAutoTerm/NewAutoQa 类型，但知识库是文档类型；
+  术语分支空转产出垃圾（知识改写输出 "rq"），"综合改写兼容"脚本拿到 "rq" 后 600 秒超时。
+- **修复（API 直改流程图）**：
+  1. `GET /api/flow/config/get?configTargetType=AGENT&configCode=<agentCode>_<agentVersion>` 取图 JSON
+  2. **saveProcess/saveGraph 载荷结构**（关键，之前一直猜错）：
+     `POST /api/flow/config/saveProcess {configTargetType, configCode, version, data:{nodes, edges}}`
+     —— 图在 **`data`** 字段（不是 showConfig）！
+  3. 删除 8 个节点（术语库检索/知识召回处理/知识改写/问答库检索/标准问答召回/选择器1/输出1/综合改写兼容）+ 9 条边
+  4. 新增边：多轮改写 → 文档召回；并把 文档召回.query、结果总结.rewrite_query 映射改为 NODE.多轮改写.content
+  5. 保存后 11 节点 10 边：开始→多轮改写→文档召回→召回结果处理→选择器→(输出|总结参数→结果总结→meta→文本组合→内容输出)
+- **验证通过**：真实运行"什么是语义通信？请结合知识库文献回答"，
+  文档召回检索到知识库 chunk（file_code/页码/正文），结果总结生成带 4 条引用的完整中文回答。
+- **已发布（ONLINE）**：/agent/version/online 成功。
+- 运行时 API：`POST /designer/createRunningSession` → 开 SSE `GET /designer/createCmdChannelNew?sessionId=&clientId=`
+  → `POST /designer/run {sessionId, input, clientId}` → `POST /designer/listTask` 查任务与结果。
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
@@ -130,9 +147,11 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 - [ ] 体验页/对外链接：用分享链接 `#/arrange/agentExp?randomCode=18f7c4b5d48b43d1836e883bc3f3e19b`（shareUuid，已生成）
 - [ ] 删除 Agent2 v1.1 空壳（版本列表勾选删除，减少干扰）
 
-### P1：让"语义通信知识问答"真正能回答（B 方案收尾）
-- 路线 1（推荐）：在 UI 打开 语义通信知识问答 流程（flowNew），删除"术语库检索、知识召回处理、知识改写、问答库检索、标准问答召回"节点，把"多轮改写"直接连到"文档召回"，其余不动 → 校验 → 调试
-- 路线 2（保底）：把 `papers/` 的 PDF 上传到"论文知识库" `zbyny1fu224y`，直接用"论文问答" agent 回答
+### P1：B 路线（已完成 ✅）
+- [x] 语义通信知识问答 流程修复（删除术语/问答分支，多轮改写直连文档召回）
+- [x] 端到端验证：知识库检索 + LLM 总结 + 引用输出
+- [x] 已发布 ONLINE
+- [ ] 补充知识库论文（重试 4 篇失败论文），提高召回覆盖
 
 ### P2：知识库补全
 - 重试 4 篇失败论文（1809.01733 等；失败原因疑似深解析模型 qwen-vl-plus 或大文件）
