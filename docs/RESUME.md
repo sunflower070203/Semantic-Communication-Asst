@@ -56,6 +56,30 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
+### 0.4 8/24 凌晨：Agent 化改造完成（引用校验节点 + 确定性 eval）✅
+- **背景**：GAN 对抗审查（docs/agent_self_review.md）判定 B 路线是"RAG 聊天机器人 + 工作流外壳"，
+  缺：生成后校验、程序化安全拒绝、确定性评测。
+- **改造（B 路线 v1.4，agentVersion `1787495161508`，已 ONLINE）**：
+  1. `meta` 脚本节点内置**引用校验**：解析结果总结 JSON（容错：去 markdown 围栏 + 截取首个 JSON 对象），
+     断言每个引用 idx 存在于本次召回 chunk（all_meta）且答案中每个 【X】 标记都有对应 refs；
+     未通过则输出 "⚠ 引用校验：[...] 未能与本次召回内容核实"。
+  2. `结果总结` prompt 增加**禁止编造引用**约束（"idx 必须真实存在于参考内容中"）。
+  3. 补丁脚本 `scripts/patch_flow_validation.py`：拉取 DRAFT 流程 → 改 meta 脚本 + prompt → saveProcess。
+- **版本迭代（平台发布纪律：ONLINE 不可编辑，只能克隆）**：
+  - v1.0 `1787326166654`（原始修复版，已下线）
+  - v1.1 `1787493573109`（首次加校验，脚本变量名 `_json` 被沙箱拒绝 → 废）
+  - v1.2 `1787493757541`（修变量名；严格 json.loads 对围栏输出假阴性 → 废）
+  - v1.3 `1787494220819`（容错解析；refs 渲染仍依赖 FUNCTION 映射 → 废）
+  - **v1.4 `1787495161508`（最终版，ONLINE）**：meta 脚本完全自解析，渲染+校验同源
+- **确定性 eval（scripts/eval_agent.py，3 场景全绿）**：
+  - concept：91.9s PASS；multistep：132.8s PASS；tool_require：71.3s PASS
+  - 断言：回答存在/无流程错误/正文【X】⊆ 引用列表/校验干净（无 ⚠）/拒绝联网编造/无任务失败
+  - eval 含失败重试一次（平台偶发抖动）；报告存 demo/eval/eval_report_*.md
+- **已知平台限制**：API 同一 designer 会话连续两次 run（追问）会命中会话锁（流程执行但结果不送达），
+  追问能力在分享页 UI 已验证可用（v1.0 实测）；eval 一律新会话跑。
+- **新分享链接**：shareUuid `22ddb3160f3e4847ba90f7b5c4f8fb60`
+  （`#/arrange/agentExp?randomCode=22ddb3160f3e4847ba90f7b5c4f8fb60&noLayout=1`）
+
 ### 0.3 8/23 深夜：知识库补全完成（4 篇失败 PDF 已重新上传并全部解析 ✅）
 - **根因定性**：当初上传的 4 篇 PDF 文件本身就是损坏的（arXiv 下载被截断，本地 papers/ 同名文件与平台大小完全对应）
   → 反复 `/kortex/kb/doc/file/reprocess` 都失败（DKE 实例 status=4）。
@@ -80,7 +104,8 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 | 语义通信自主Agent3 | `407be567-2e47-4391-8249-729d943d1753` | `1787370379269` | processAgentEngine | **主资产**：角色对话 AutoBotV2，已验证自主问答（带文献引用） |
 | 语义通信自主Agent2 | `42c92470-bb63-4b4f-9d4a-9a61abd24586` | v1.0=`1787366954788`（AutoBotV2）；v1.1=`1787369863842`（defaultAgentEngine 空壳） | processAgentEngine | 实验；v1.0 设计页二次访问白屏；v1.1 建议删除 |
 | 语义通信助手 | `eb3a4ce1-2037-4dbd-938b-5f3357676455` | `1787321985242` | processAgentEngine | 流程：开始→脚本任务→结果渲染任务；脚本为出网探测（沙箱禁网，见第 3 节） |
-| 语义通信知识问答 | `fcae0115-ea0f-4c86-b688-56ac9c88db05` | `1787326166654` | processAgentEngine | 完整 RAG 流程已保存并绑定语义通信知识库；运行时断在"术语库检索"（待修，见第 4 节） |
+| 语义通信知识问答 v1.4（主） | `fcae0115-ea0f-4c86-b688-56ac9c88db05` | `1787495161508` | processAgentEngine | **ONLINE**：引用校验节点 + 防编造约束，eval 3/3 全绿（见 0.4） |
+| 语义通信知识问答 v1.0（旧） | `fcae0115-ea0f-4c86-b688-56ac9c88db05` | `1787326166654` | processAgentEngine | 已下线；无校验的原始修复版 |
 | 论文问答（参考/保底） | `d2d3f9ec-37c2-4f1d-ba4a-afaaf58cd398` | `1783783312184` | processAgentEngine | 已验证可用的知识问答 RAG 流程，绑定"论文知识库" `zbyny1fu224y` |
 | 东南大学论文助手 | `97f5a8f2-dd4b-414c-a16f-29853a0c1444` | `1783782865950` | processAgentEngine | 旧草稿，勿动 |
 

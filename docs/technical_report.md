@@ -19,7 +19,7 @@
 
 | 名称 | agentCode | agentVersion | 引擎 | 状态 |
 |---|---|---|---|---|
-| 语义通信知识问答（B） | `fcae0115-ea0f-4c86-b688-56ac9c88db05` | `1787326166654` | processAgentEngine / workflow | ONLINE，端到端验证通过 |
+| 语义通信知识问答（B，主） | `fcae0115-ea0f-4c86-b688-56ac9c88db05` | `1787495161508` | processAgentEngine / workflow | ONLINE，引用校验 + 防编造，eval 3/3 全绿 |
 | 语义通信自主Agent3（A） | `407be567-2e47-4391-8249-729d943d1753` | `1787370379269` | processAgentEngine / AutoBotV2 + ReAct | ONLINE，自主问答验证通过 |
 
 ### 2.2 知识库
@@ -102,8 +102,22 @@
                 └─→ 选择器
                      ├─→ 输出（直接结束）
                      └─→ 总结参数 → 结果总结（LLM）
-                          └─→ 引用组合（脚本） → 文本组合 → 内容输出
+                          └─→ meta（脚本：引用校验 + 引用组合） → 文本组合 → 内容输出
 ```
+
+### 4.3 引用校验节点（Agent 化改造，v1.4）
+
+`meta` 脚本节点在渲染引用列表的同时执行程序化校验：
+
+- 容错解析结果总结 JSON（去 markdown 围栏、截取首个 JSON 对象）；
+- 断言每个引用 `idx` 真实存在于本次召回 chunk（`all_meta`）中；
+- 断言答案正文每个 【X】 标记都对应一个 refs 条目；
+- 任一不通过 → 输出 "⚠ 引用校验：[...] 未能与本次召回内容核实"。
+
+同时 `结果总结` prompt 强制"引用 idx 必须真实存在于参考内容中，禁止编造引用"。
+
+> 平台发布纪律：ONLINE 配置不可编辑，只能 `cloneAndCreateNewVersion`（`configCleanSourceEnum=KEEP`）
+> 克隆新版本 → 改 DRAFT 流程 → saveProcess → online。v1.0→v1.4 迭代即按此流程。
 
 ### 4.2 修复过程记录（重要排障案例）
 
@@ -189,6 +203,18 @@ SSE 输出可用于实时进度，但体积大（含 thinking 流），不适合
 - 最终回答结构化、带 【I】-【V】引用且附来源说明；
 - 引用可精确到论文章节（例：Q6 回答定位到《SNR-Adaptive Deep JSCC》3.1 节的自适应解码器设计）；
 - 单题端到端耗时约 100-180s（多轮改写 + 召回 + 总结）。
+
+### 7.3 确定性 eval（v1.4，2026-08-24）
+
+`scripts/eval_agent.py` 三场景断言结果（含平台抖动自动重试一次）：
+
+| 场景 | 结果 | 关键断言 |
+|---|---|---|
+| concept | PASS 91.9s | 回答存在 / 引用↔refs 一致 / 校验干净 |
+| multistep | PASS 132.8s | 同上 |
+| tool_require | PASS 71.3s | 拒绝联网编造（"不具备/无法/实时联网检索"）+ 引用校验 |
+
+报告：`demo/eval/eval_report_*.md`。
 
 ## 8. 仓库结构与可复现性
 

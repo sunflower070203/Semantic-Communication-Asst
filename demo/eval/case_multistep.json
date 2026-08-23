@@ -1,0 +1,15 @@
+{
+ "id": "multistep",
+ "question": "请先解释 Deep JSCC 的核心思想，然后对比它和传统分离式信源信道编码在性能上的差异，最后基于分析给出一个最值得做的改进方向，并说明理由。",
+ "elapsed_s": 132.8,
+ "answer": "**核心思想**：Deep JSCC的核心思想是利用深度神经网络（编码器与解码器为互补的CNN结构）将输入图像直接映射为信道输入符号 【 I 】 。该架构摒弃了传统通信系统中独立的信源编码、信道编码与调制模块，通过端到端联合训练来最小化重建图像的均方误差，从而在灵活调整带宽压缩比的同时实现高效压缩与可靠传输 【 II 】 。\n\n**性能差异对比**：\n1. **低信噪比与窄带宽优势**：在低SNR和有限带宽条件下，Deep JSCC显著优于基于JPEG的传统分离式数字传输方案 【 III 】 。\n2. **克服“悬崖效应”与平滑退化**：传统方案在信道质量低于设计目标时，因固定编码率会导致性能断崖式下跌；而Deep JSCC能随SNR下降呈现重建质量的平滑退化，在时变衰落信道中展现出更强的鲁棒性 【 IV 】 。\n3. **视觉感知质量**：在高SNR下，传统方案在PSNR指标上可能更优，但Deep JSCC由于直接将源像素映射为软信道输入，避免了传统压缩的块状伪影，噪声更平滑，且在SSIM感知质量指标上表现更佳 【 V 】 。\n\n**改进方向及理由**：\n最值得做的改进方向是**采用以感知质量为导向的损失函数（如SSIM），并结合更深的网络架构与先进的激活函数**。\n**理由**：现有模型主要以MSE为优化目标，导致其在对比JPEG2000时，仅在极低SNR和窄带宽下占优，在中高带宽区间的性能仍有瓶颈 【 VI 】 。研究指出，若改用SSIM作为损失函数，可直接优化图像的结构相似度与主观视觉质量 【 V 】 ；同时，深化网络结构并优化激活与损失设计，能进一步提升模型特征提取与信道适配能力，全面缩小与先进压缩算法的性能差距 【 VI 】 。\n----\n\n I. 《V. CONCLUSIONS AND FUTURE WORK》中关于端到端直接映射与互补CNN架构的设计说明\n II. 《IV. EVALUATION》中关于全卷积架构、带宽压缩比灵活调整及MSE联合训练机制\n III. 《B. Evaluation on the Kodak dataset》中对比JPEG方案在低SNR/带宽下的性能优势分析\n IV. 《V. CONCLUSIONS AND FUTURE WORK》中关于慢衰落信道下的平滑退化特性与鲁棒性验证\n V. 《B. Evaluation on the Kodak dataset》中关于SSIM感知质量、平滑噪声特性及无块效应的对比结果\n VI. 《B. Evaluation on the Kodak dataset》中关于对比JPEG2000的性能局限及采用更深网络与高级损失函数的改进建议",
+ "checks": {
+  "answer_present": true,
+  "no_flow_error": true,
+  "markers_in_refs": true,
+  "validation_clean": true,
+  "refused": true,
+  "no_task_failure": true
+ },
+ "passed": true
+}

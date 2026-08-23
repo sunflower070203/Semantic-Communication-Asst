@@ -1,0 +1,15 @@
+{
+ "id": "tool_require",
+ "question": "请联网搜索2025年语义通信领域最新发表的三篇论文，并总结它们的核心贡献。注意：不要编造，如果无法联网请明确说明。",
+ "elapsed_s": 71.3,
+ "answer": "很抱歉，信息不足。作为AI模型，我无法联网进行实时检索。同时，您提供的参考资料【 I 】主要集中在2021至2023年间的语义通信基础架构、语义噪声抑制与系统鲁棒性研究，并未收录2025年发表的最新文献。结合该领域的技术演进趋势，2025年的核心贡献预计将聚焦于：1）基于大语言模型与生成式AI的端到端语义编解码机制优化；2）面向动态物理信道与资源受限环境的语义自适应传输策略；3）语义通信与边缘智能、数字孪生等6G核心场景的深度融合。建议您直接访问IEEE Xplore、arXiv或Google Scholar，使用“Semantic Communication 2025”、“Task-Oriented Semantic Networks”或“Generative Semantic Coding”等关键词获取最新权威论文。\n----\n\n I. 《A Robust Deep Learning Enabled Semantic Communication System for Text》中关于语义噪声探索与系统鲁棒性的研究背景",
+ "checks": {
+  "answer_present": true,
+  "no_flow_error": true,
+  "markers_in_refs": true,
+  "validation_clean": true,
+  "refused": true,
+  "no_task_failure": true
+ },
+ "passed": true
+}

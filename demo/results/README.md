@@ -2,11 +2,13 @@
 
 ## 在线体验链接（B 路线 · 语义通信知识问答）
 
-分享链接（shareUuid `d1e2c75974744be5acceda575766a8bc`，已启用）：
+分享链接（v1.4，含引用校验节点；shareUuid `22ddb3160f3e4847ba90f7b5c4f8fb60`，已启用）：
 
 ```
-http://10.128.203.200:30226/agent/index.html#/arrange/agentExp?randomCode=d1e2c75974744be5acceda575766a8bc&noLayout=1
+http://10.128.203.200:30226/agent/index.html#/arrange/agentExp?randomCode=22ddb3160f3e4847ba90f7b5c4f8fb60&noLayout=1
 ```
+
+> 旧链接（shareUuid `d1e2c75974744be5acceda575766a8bc`）指向已下线的 v1.0，不再使用。
 
 平台实际运行截图（2026-08-23，问题：什么是语义通信？请结合知识库文献说明，并给出文献来源。）：
 

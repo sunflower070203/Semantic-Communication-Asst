@@ -35,7 +35,7 @@ COOKIE = (
 )
 
 AGENT_CODE = "fcae0115-ea0f-4c86-b688-56ac9c88db05"
-AGENT_VERSION = "1787326166654"
+AGENT_VERSION = "1787495161508"  # v1.4 (self-contained refs parse, no FUNCTION dependency)
 KB_CODE = "ryekr4gqw2pn"
 
 QUESTIONS = [
@@ -110,7 +110,8 @@ def run_question(sid, client_id, question, timeout=360):
     )
     started = time.time()
     tasks = []
-    answer = ""
+    baseline = fetch_answer(sid)
+    answer = baseline
     while time.time() - started < timeout:
         time.sleep(10)
         try:
@@ -123,13 +124,12 @@ def run_question(sid, client_id, question, timeout=360):
         except Exception:
             tasks = []
         answer = fetch_answer(sid)
-        is_real = len(answer) > 60 and not any(mk in answer for mk in WELCOME_MARKERS)
-        all_done = bool(tasks) and all(t.get("status") == "FINISHED" for t in tasks)
-        if is_real and all_done:
-            return tasks, time.time() - started, answer
+        is_real = (
+            answer != baseline
+            and len(answer) > 60
+            and not any(mk in answer for mk in WELCOME_MARKERS)
+        )
         if is_real:
-            return tasks, time.time() - started, answer
-        if all_done and len(tasks) >= 4:
             return tasks, time.time() - started, answer
         if any(t.get("status") in ("ERROR", "FAILED", "CANCELED") for t in tasks):
             return tasks, time.time() - started, answer

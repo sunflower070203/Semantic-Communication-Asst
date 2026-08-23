@@ -1,0 +1,32 @@
+# Probe multi-step-v1.2
+
+- 时间: 2026-08-23 22:07:15 中国标准时间
+- 用时: 133.2s | 任务数: 8 | 任务类型: [None, 'KNOWLEDGES_DOC', 'SCRIPT', 'SCRIPT', None, 'SCRIPT', None, None]
+- 召回来源: {"1809.01733.pdf": 0.7539878038145627}
+
+## 问题
+
+请先解释 Deep JSCC 的核心思想，然后对比它和传统分离式信源信道编码在性能上的差异，最后基于分析给出一个最值得做的改进方向，并说明理由。
+
+## 回答
+
+Deep JSCC 的核心思想是通过互补的卷积神经网络（CNN）将输入图像直接映射为信道符号，实现信源与信道编码的端到端联合优化【 I 】。该架构的编解码器网络通过联合训练最小化重建图像的均方误差（MSE），从而在传输过程中同时完成高效压缩与可靠通信，直接建立源数据到软信道输入的映射【 II 】。
+
+与传统分离式数字传输方案相比，Deep JSCC 在性能上存在显著差异：
+1. **低带宽与低信噪比优势**：在有限信道带宽和低 SNR 条件下，Deep JSCC 显著优于采用 JPEG/JPEG2000 结合信道编码的传统方案，而在高带宽与高 SNR 下性能与之持平【 III 】。
+2. **克服“悬崖效应”**：传统方案因固定码率存在“悬崖效应”，信道质量低于目标 SNR 时重建质量会断崖式下降；Deep JSCC 则随信道恶化呈现“优雅退化”，且信道改善时性能不会立即饱和【 IV 】。
+3. **信道波动适应性**：Deep JSCC 学习到的编码表示对时变信道质量波动具有强鲁棒性，而传统分离方案仅在优化对应的特定信道条件下表现良好【 V 】。
+4. **主观感知质量更优**：尽管在高 SNR 下传统方案 PSNR 可能更高，但 Deep JSCC 的 SSIM 值更高，视觉感知更优，且其引入的噪声比传统 JPEG 的块状伪影更平滑【 VI 】。
+
+基于上述分析，最值得做的改进方向是：**采用更深的神经网络架构，并引入更先进的激活函数与基于感知指标（如 SSIM）的损失函数**【 VII 】。
+理由在于：当前模型主要依赖 MSE 损失，虽能优化 PSNR 但未能完全对齐人类视觉感知；且在噪声信道中仅学习低维表征不足以充分捕捉图像的显著特征。通过深化网络结构并替换/融合 SSIM 等损失函数，可进一步提取关键视觉特征，突破高 SNR 区域的性能瓶颈，从而在客观指标与主观视觉质量上实现双重提升【 VIII 】。
+----
+
+ I. 《V. CONCLUSIONS AND FUTURE WORK》中关于Deep JSCC联合架构与核心思想的描述
+ II. 《IV. EVALUATION》中关于MSE损失与编解码联合训练的机制
+ III. 《B. Evaluation on the Kodak dataset》中低带宽/低SNR下的性能对比结果
+ IV. 《B. Evaluation on the Kodak dataset》中关于避免“悬崖效应”与优雅退化的特性
+ V. 《B. Evaluation on the Kodak dataset》中对时变信道鲁棒性与数字方案局限性的对比
+ VI. 《B. Evaluation on the Kodak dataset》中SSIM感知质量优势与噪声平滑度分析
+ VII. 《B. Evaluation on the Kodak dataset》中关于网络架构深化与损失函数优化的展望
+ VIII. 《B. Evaluation on the Kodak dataset》中采用SSIM作为损失函数的改进建议
