@@ -1,0 +1,22 @@
+{
+ "question": "SNR 自适应的深度联合信源信道编码是如何实现的？",
+ "answer": "SNR自适应的深度联合信源信道编码主要基于自编码器架构实现，核心在于解码端利用导频信号估计信道状态并动态调整解码过程。具体实现流程如下【I】：\n1. **编码与传输**：编码器将输入图像映射为复数向量并施加平均功率约束，通过调整末层卷积核数量控制带宽比【II】。编码信号经噪声信道传输，同时发射机发送接收端已知的导频信号【III】。\n2. **SNR估计与映射**：解码器利用接收到的导频信号估计信道SNR，并将其转换为信道噪声方差。该方差随后被扩展为与接收信号维度一致的SNR映射图（SNR map）【IV】。\n3. **自适应解码**：SNR映射图与信道输出信号进行逐元素相加，作为辅助解码信息输入至反卷积网络中，使解码器能够根据实时信道条件自适应重建图像【V】。\n4. **鲁棒性保障**：该方案对解码端的SNR估计噪声具有强鲁棒性，实验表明即使SNR估计存在较强干扰，模型性能也仅轻微下降【VI】。\n----\n\n I. 《SNR-Adaptive Deep Joint Source-Channel Coding》摘要中关于自编码器架构与自适应解码的概述\n II. 《SNR-Adaptive Deep Joint Source-Channel Coding》第3节中编码器卷积结构与带宽比调节机制\n III. 《SNR-Adaptive Deep Joint Source-Channel Coding》系统模型中导频信号传输与接收端输入的说明\n IV. 《SNR-Adaptive Deep Joint Source-Channel Coding》第2节中SNR估计、噪声方差计算及SNR映射图生成过程\n V. 《SNR-Adaptive Deep Joint Source-Channel Coding》第3.1节中SNR自适应解码器的双输入结构与逐元素相加操作\n VI. 《SNR-Adaptive Deep Joint Source-Channel Coding》第5节结论部分关于SNR估计噪声鲁棒性的实验验证",
+ "elapsed_s": 114.3,
+ "sources": {
+  "2102.00202.pdf": 0.9318644201142874,
+  "1809.01733.pdf": 0.8008130852796191,
+  "2006.10685.pdf": 0.47723996429370674
+ },
+ "task_count": 8,
+ "task_statuses": [
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED"
+ ],
+ "status": "OK"
+}

@@ -1,0 +1,23 @@
+{
+ "question": "什么是任务导向通信（task-oriented communication）？和经典通信范式有什么不同？",
+ "answer": "任务导向通信（Task-Oriented Communication）是语义通信的核心范式之一【I】。其根本宗旨是将完成收发双方的协同任务作为通信的终极目标【II】，在相关学术界定中常直接等同于任务/目标导向通信（对应Level 2与Level 3通信）【III】。\n\n与经典通信（技术通信）范式相比，其主要差异体现在：\n1. **优化目标**：经典通信致力于降低符号或比特传输错误率，追求物理层的精确重建；任务导向通信则聚焦于准确提取与解释符号背后的语义，旨在缩小收发端间的语义差距，而非单纯追求比特无误【V】。\n2. **系统架构**：经典通信遵循“信源编码-信道编码-信道传输-信道解码-信源解码”的线性流程；任务导向通信引入了语义编解码与同义映射等扩展模块，接收端在解析语义后可直接触发与任务相关的动作（Take Action）【IV】。\n3. **评估指标**：传统系统依赖误码率（BER）或误符号率；任务导向系统采用与具体业务强相关的指标（如任务执行准确率、决策成功率等）进行性能度量【I】。\n4. **应用定位**：经典通信适用于通用数据传输；任务导向通信专为智能体协同场景设计，广泛应用于机器对机器（M2M）或人对机器（H2M）的自主交互与决策【V】。\n----\n\n I. 《Semantic Communications: Principles and Challenges》摘要及性能指标论述\n II. 《Communication serves for a cooperative task》中关于通信终极目标与层级结构的说明\n III. 《INTRODUCTION》脚注中语义通信与任务/目标导向通信的定义\n IV. 《FROM INFORMATION THEORY TO SEMANTIC THEORY》中传统与语义通信系统架构对比图（Fig. 2）\n V. 《INTRODUCTION》中关于语义通信优化目标与应用场景的阐述",
+ "elapsed_s": 91.7,
+ "sources": {
+  "2201.01389.pdf": 0.5903469282306673,
+  "2401.13387.pdf": 0.5020873511747408,
+  "2212.01485.pdf": 0.4916862552080568,
+  "2206.02596.pdf": 0.24476105252186592
+ },
+ "task_count": 8,
+ "task_statuses": [
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED",
+  "FINISHED"
+ ],
+ "status": "OK"
+}
