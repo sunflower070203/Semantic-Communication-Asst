@@ -1,6 +1,6 @@
 # 语义通信助手 — 进度恢复文档
 
-> 最后更新：2026-08-22 11:55（Asia/Shanghai）
+> 最后更新：2026-08-23 17:45（Asia/Shanghai）
 > 用途：平台会话中断后，按此文档恢复全部进度。所有关键标识符和待办在此记录。
 
 ## 0. 重大进展（A 路线：角色对话 Agent 已验证可自主运行）
@@ -18,6 +18,24 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 > 注意：设计页表单只在"创建后首次访问"渲染，离开再回来会白屏（平台前端 bug，见 3.5）。
 > 配置 Agent3 后尽量不要再进它的设计页；要改配置就新建一个角色对话 Agent 立即配置。
+
+### 0.1 8/23 更新（校内网恢复，续作）
+- **Agent3 已发布（ONLINE）**：`/agent/version/online` 成功。
+- **配置确认持久化**：`/agent/version/config/query?code=&version=&versionName=` 返回完整表单数据
+  （node_model.taskPlanning 含 modelCode `edf7a63d4352499ebeb1a8255f5a9feb` / qwen3.6-plus；
+  node_role.role / node_constraint.constraint 全文都在）。**运行时读这份数据，不是 config/list**。
+- **运行入口 = 分享链接（最重要发现）**：
+  1. `POST /agent/share/create {agentCode, agentVersion}` → shareUuid
+  2. 打开 `#/arrange/agentExp?randomCode=<shareUuid>&noLayout=1`（注意是 **shareUuid**，不是 experienceCode）
+  3. 页面输入框发消息即可运行。今早验证：Agent3 完整回答"语义通信核心思想+4篇文献引用"。
+- **工具可挂载但执行失败（平台限制）**：
+  - `POST /task/add {agentCode, agentVersion, tool:{code,name,version,toolType,toolExecuteType:"DEFAULT"}, taskName, taskDesc, taskLimit}` 成功（data:1）
+  - 运行时 agent 会规划"调用联网搜索工具"，但执行报 `AGENT_TASK_DEFAULT_FAILED`（任务执行失败）
+  - `/tools/debugExecuteApiTool` 直接 500 → **工具执行沙箱/运行器在平台侧故障**（与脚本沙箱禁网一致）
+  - 已用 `POST /task/delete {agentCode, agentVersion, taskName}` 删除两个工具任务，恢复干净状态
+- **auto/new 体验流不可用**：`/agent/auto/new/session/create {template:"AutoBotV2", relationCode}` 报
+  "Failed to create the solution"（solutionCode 为空，平台未部署解决方案）。
+- 共享页 UI 输入自动化不稳定：建议用"新开对话"+手动输入，或直接用上面 API + 页面。
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
@@ -71,6 +89,14 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
    校验恒报"请选择工具"，工具列表不更新。**需人工在 UI 添加工具**（见 3.9）。
 10. **体验页路由**：`#/arrange/agentExp` 和 `#/arrange/trekAgentExp?randomCode=<code>&noLayout=1` 均被重定向回 agentConfig
     （可能因版本未发布或平台 bug）；体验启用接口 `/agent/auto/new/experience/enable` 可用（返回 experienceCode）。
+11. **8/23 新增**：
+    - 角色对话 Agent 的配置读取/保存链：`config/query`（读 nodeFormAttribute）↔ `form/save`（写）；`form/save`
+      只接受 node_model/node_role/node_constraint/node_combination/node_longTermMemory/shortTermMemory，
+      **不接收任务工具**（工具走 `/task/add`）。
+    - `/task/add` 需要 `tool.toolExecuteType`（"DEFAULT"），否则报 getToolExecuteType null。
+    - 分享运行链路：`/agent/share/create` → `#/arrange/agentExp?randomCode=<shareUuid>` →
+      `/agent/share/session/init` → `/designer/createCmdChannelNew`(SSE) → `/designer/run`。
+    - `/designer/run` 需先建立 SSE 通道（clientId），否则报"调试器未与服务端建立连接"。
 
 ### 3.5 设计页表单渲染 bug（重要）
 - 角色对话 Agent 的 agentDesign 页**只在创建后首次访问渲染完整表单**（角色/任务/记忆三栏 + 调试面板）。
@@ -97,10 +123,11 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 ### P0：A 路线收尾（主）
 - [x] 角色对话 Agent 自主运行验证（Agent3，语义通信问答 + 文献引用）
-- [ ] 人工给 Agent3 挂工具（联网搜索 + 文档在线解析，见 3.9）
-- [ ] 挂完工具后重新测试"找文献+读文献"闭环（让 agent 查 arXiv 并总结）
-- [ ] 发布 Agent3（版本列表中"发布"）→ 再试体验页/对外链接
-- [ ] 若发布后体验页仍跳转，改用"API调用"获取调用方式
+- [x] 发布 Agent3（ONLINE）
+- [x] 确认运行入口（分享链接 + config/query 持久化）
+- [ ] **工具执行待平台侧修复**（/task/add 可挂，执行报 AGENT_TASK_DEFAULT_FAILED；/tools/debugExecuteApiTool 500）
+- [ ] 找文献+读文献能力：改用 B 路线工作流 RAG（知识库检索），或等平台修工具沙箱
+- [ ] 体验页/对外链接：用分享链接 `#/arrange/agentExp?randomCode=18f7c4b5d48b43d1836e883bc3f3e19b`（shareUuid，已生成）
 - [ ] 删除 Agent2 v1.1 空壳（版本列表勾选删除，减少干扰）
 
 ### P1：让"语义通信知识问答"真正能回答（B 方案收尾）
