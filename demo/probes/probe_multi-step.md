@@ -1,0 +1,25 @@
+# Probe multi-step
+
+- 时间: 2026-08-23 21:49:10 中国标准时间
+- 用时: 132.9s | 任务数: 8 | 任务类型: [None, 'KNOWLEDGES_DOC', 'SCRIPT', 'SCRIPT', None, 'SCRIPT', None, None]
+- 召回来源: {"1809.01733.pdf": 0.7539878038145627}
+
+## 问题
+
+请先解释 Deep JSCC 的核心思想，然后对比它和传统分离式信源信道编码在性能上的差异，最后基于分析给出一个最值得做的改进方向，并说明理由。
+
+## 回答
+
+The core idea of Deep JSCC is to bypass traditional separation-based designs by employing a joint source-channel coding architecture modeled with complementary CNNs, which maps input images directly to channel inputs and is jointly trained to minimize the mean squared error (MSE) of the reconstructed image 【I】. This approach enables the network to simultaneously learn efficient image compression and reliable communication over noisy channels 【I】.
+
+In terms of performance comparison, conventional separation-based digital transmission schemes suffer from a distinct "cliff effect" 【II】. When channel quality drops below a target SNR, reconstruction quality collapses; conversely, when SNR exceeds the target, quality saturates because the allocated bits for compression remain fixed 【II】. In contrast, Deep JSCC significantly outperforms these baseline schemes in low-bandwidth and low-SNR regimes, exhibiting a "graceful degradation" characteristic: performance degrades smoothly as channel quality worsens and improves continuously as it gets better, demonstrating strong robustness to time-varying channel fluctuations 【III】. Additionally, by directly mapping source values to soft channel inputs, Deep JSCC avoids the visible blocking artifacts typical of JPEG at low SNR, resulting in smoother visual noise 【IV】.
+
+Based on this analysis, the most worthwhile improvement direction is shifting the optimization objective from MSE to perceptual quality metrics (e.g., SSIM) and adopting deeper network architectures with more sophisticated loss functions. The rationale is that current Deep JSCC training relies solely on minimizing MSE, which primarily optimizes PSNR 【V】. However, at higher SNRs, while digital schemes may surpass Deep JSCC in PSNR, Deep JSCC still holds potential for superior perceptual quality 【IV】. Incorporating SSIM as a loss function directly optimizes human visual experience rather than mere pixel-level fidelity 【IV】. Furthermore, the literature explicitly notes that utilizing deeper neural network architectures alongside more advanced activation and loss functions is key to further breaking through the current performance bottlenecks of the algorithm 【VI】.
+----
+
+ I. 《Conclusions and Future Work》中 Deep JSCC 架构设计与联合学习机制的描述
+ II. 《Evaluation on the Kodak dataset》中传统分离式方案的“悬崖效应”与性能饱和分析
+ III. 《Evaluation on the Kodak dataset》中 Deep JSCC 对时变信道的鲁棒性与平缓降级特性
+ IV. 《Evaluation on the Kodak dataset》中 Deep JSCC 与 JPEG 在视觉伪影及 SSIM 指标上的对比
+ V. 《Evaluation》部分中 Deep JSCC 基于 MSE 损失函数的优化目标定义
+ VI. 《Evaluation on the Kodak dataset》中关于采用更深网络架构以改进性能的建议
