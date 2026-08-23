@@ -56,6 +56,24 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
+### 0.3 8/23 深夜：知识库补全完成（4 篇失败 PDF 已重新上传并全部解析 ✅）
+- **根因定性**：当初上传的 4 篇 PDF 文件本身就是损坏的（arXiv 下载被截断，本地 papers/ 同名文件与平台大小完全对应）
+  → 反复 `/kortex/kb/doc/file/reprocess` 都失败（DKE 实例 status=4）。
+- **用户下载有效版本**（papers/1809.01733v4 / 2201.01389v5 / 2102.00202v2 / 2302.02287v1）后，
+  **绕过 UI 用 API 完成上传**（UI"导入"对话框 CDP 点击无效）：
+  1. `GET /aihub/api/v1/sts?type=upload&path=kortex/kb/doc/file/<文件名>&fileId=<任意hash>`
+     → 返回 `{accessKeyId, accessKeySecret, securityToken, bucket, endpoint, type:"MINIO", path:"apsara/kortex/kb/doc/file/<随机>/<文件名>"}`
+     （不带 type=upload 时只返回 presigned url 没有 secretKey，必须带全三个参数）
+  2. 用 AWS SigV4 对 `PUT /minio-test/<sts.path>` 预签名后直传文件（`scripts/kb_upload.py` 已实现并验证 200）
+  3. `POST /kortex/kb/doc/file/uploadFromPreUploadPaths {kbCode, paths:[<sts.path>], userMetadata:{}}` 注册，自动触发解析
+- **结果**：语义通信知识库 `ryekr4gqw2pn` 现在 **10 篇全部 state=200（解析成功）**：
+  1809.01733（41 chunks）/ 2201.01389（57）/ 2102.00202（15）/ 2302.02287（15）+ 原有 6 篇。
+  已删除 4 个旧损坏条目（state=500，同名重复），文件清单干净。
+- **端到端复验**：B 路线 agent 真实运行"Deep JSCC 和 DeepSC 有什么区别？请结合知识库文献回答"，
+  文档召回命中 2302.02287（score 0.95），最终答案带 【I】-【IV】引用，完整跑通。
+  （新增运行时取答案方式：`GET /designer/pageListLatestMsg?sessionCode=<uniqueCode>&pageIndex=0&pageSize=50`，
+  消息里 `blocks[].blockContent` 是最终文本；`/designer/listTask` 只给中间任务。）
+
 ### 智能体
 | 名称 | agentCode | 版本 | 引擎 | 状态 |
 |---|---|---|---|---|
@@ -69,7 +87,7 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 ### 知识库
 | 名称 | code | 说明 |
 |---|---|---|
-| 语义通信知识库 | `ryekr4gqw2pn` | 5 篇已解析（2006.10685、2401.13387、2401.14160、2312.05062、2206.02596）；4 篇失败（1809.01733、2201.01389、2102.00202、2302.02287）；1 篇排队（2212.01485） |
+| 语义通信知识库 | `ryekr4gqw2pn` | **10 篇全部已解析**（含 1809.01733 / 2201.01389 / 2102.00202 / 2302.02287 补传成功；2212.01485 已排队完成） |
 | 论文知识库 | `zbyny1fu224y` | 用户个人论文，6 篇已解析；论文问答在用 |
 
 ### 工具箱
@@ -91,7 +109,8 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 1. **脚本沙箱禁止网络**：支持模块仅 `re/json/string/math/random/set/frozenset/DateTime/uuid`，无网络库；`urllib.request` 报 "not supported module"。内置 request 只是请求 ID。→ 检索不能走脚本节点。
 2. **流程节点映射由平台 UI 生成**：API 直接构造 saveProcess 会报"图解析异常/节点缺失入参配置/引用关系已变更"。节点间 input/output 映射必须在 UI 里拖线生成。
 3. **调试运行**：`/designer/run` API 常报 10003 会话锁；UI 调试面板可用。自动化注入文本需 CDP `Input.insertText`（普通 fill 对 React 不认）。
-4. **知识库上传**：`/kortex/kb/doc/file/list` 可查状态；上传用详情页"导入"按钮（原生文件选择器，自动化无法注入）。kbdetail 页"添加文件"按钮禁用，要用 `#/app-pc-kb/kbase/detail?code=<kbcode>` 页的"导入"。
+4. **知识库上传（API 直传，已跑通）**：`/kortex/kb/doc/file/list` 可查状态。UI"导入"对话框 CDP 无法注入文件，
+   用 `scripts/kb_upload.py`（STS → SigV4 PUT → uploadFromPreUploadPaths）绕过，见 0.3 节。
 5. **引擎升级**：quick/create 建的是 defaultAgentEngine；需调 `/agent/version/upgradeNewProcessAgentRefVersion` 升级为 processAgentEngine 才能跑流程。
 6. 智能体"空"（Agent Is Empty）：流程未保存/校验通过时会报此错；流程必须通过 saveProcess 校验。
 7. **角色对话 Agent 配置保存链路（重要）**：
@@ -151,11 +170,11 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 - [x] 语义通信知识问答 流程修复（删除术语/问答分支，多轮改写直连文档召回）
 - [x] 端到端验证：知识库检索 + LLM 总结 + 引用输出
 - [x] 已发布 ONLINE
-- [ ] 补充知识库论文（重试 4 篇失败论文），提高召回覆盖
+- [x] 补充知识库论文（4 篇失败论文已用 API 补传，10/10 全部解析成功）
 
 ### P2：知识库补全
-- 重试 4 篇失败论文（1809.01733 等；失败原因疑似深解析模型 qwen-vl-plus 或大文件）
-- 等 2212.01485 排队完成
+- [x] 4 篇失败论文 API 补传并全部解析（根因：源 PDF 损坏，非解析模型问题）
+- [x] 2212.01485 排队完成
 
 ### P3：交付物（8 月 31 日前）
 - Demo 视频、项目策划书（docs/plan_book.md 待写）、技术文档（docs/technical_report.md 待写）、zip 打包提交
