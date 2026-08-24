@@ -11,22 +11,18 @@ Usage:
 import hashlib
 import hmac
 import json
+import os
 import sys
 import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
 
-PLATFORM = "http://10.128.203.200:30226"
-COOKIE = (
-    "G_baseline_gsid=c338c6fbf571426bad461f37517d3fa9-gsid-inner; "
-    "G_baseline_accountType=manager; G_baseline_platform=pc; "
-    "x-sfm-workspace=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "projectCode=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "x-sfm-workspacecode=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "x-sfm-workspacename=12345; x-sfm-workspace-code=606add01-3e5d-4a09-84b7-18b2c2b8f6f8"
-)
+PLATFORM = config.PLATFORM
+COOKIE = config.COOKIE
 IMPORT_PATH = "kortex/kb/doc/file/"
 
 
@@ -131,6 +127,11 @@ def upload_one(kb_code, file_path, import_prefix=IMPORT_PATH):
         data={"kbCode": kb_code, "paths": [object_name], "userMetadata": {}},
     )
     print(f"[{name}] register: {json.dumps(reg, ensure_ascii=False)[:300]}")
+    if not reg.get("success"):
+        raise RuntimeError(
+            f"[{name}] 注册失败: {reg.get('errorCode')} {reg.get('errorMsg') or reg.get('errorMessage')} "
+            f"（对象已上传但未注册，需清理 minio 对象: {object_name}）"
+        )
     return reg
 
 

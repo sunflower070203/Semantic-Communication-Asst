@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import threading
+import time
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -23,9 +24,9 @@ def main():
     stop = threading.Event()
     sse = m.SseThread(sid, client, stop)
     sse.start()
-    deadline = __import__("time").time() + 15
-    while __import__("time").time() < deadline and not sse.first_lines:
-        __import__("time").sleep(0.5)
+    deadline = time.time() + 15
+    while time.time() < deadline and not sse.first_lines:
+        time.sleep(0.5)
 
     q1 = "什么是语义通信？它和传统通信有什么区别？"
     q2 = "你刚才提到了语义鸿沟，具体指什么？能结合论文展开讲讲吗？"

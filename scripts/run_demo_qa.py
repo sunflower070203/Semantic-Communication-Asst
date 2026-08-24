@@ -23,20 +23,14 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
 
-PLATFORM = "http://10.128.203.200:30226"
-COOKIE = (
-    "G_baseline_gsid=c338c6fbf571426bad461f37517d3fa9-gsid-inner; "
-    "G_baseline_accountType=manager; G_baseline_platform=pc; "
-    "x-sfm-workspace=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "projectCode=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "x-sfm-workspacecode=606add01-3e5d-4a09-84b7-18b2c2b8f6f8; "
-    "x-sfm-workspacename=12345; x-sfm-workspace-code=606add01-3e5d-4a09-84b7-18b2c2b8f6f8"
-)
-
-AGENT_CODE = "fcae0115-ea0f-4c86-b688-56ac9c88db05"
-AGENT_VERSION = "1787495161508"  # v1.4 (self-contained refs parse, no FUNCTION dependency)
-KB_CODE = "ryekr4gqw2pn"
+PLATFORM = config.PLATFORM
+COOKIE = config.COOKIE
+AGENT_CODE = config.AGENT_CODE
+AGENT_VERSION = config.AGENT_VERSION
+KB_CODE = config.KB_CODE
 
 QUESTIONS = [
     "什么是语义通信？它和传统通信有什么区别？",
@@ -103,11 +97,18 @@ WELCOME_MARKERS = ("请问您需要了解哪方面的信息", "我能为您提�
 
 
 def run_question(sid, client_id, question, timeout=360):
-    http_json(
+    run_resp = http_json(
         f"{PLATFORM}/designer/run",
         method="POST",
         data={"sessionId": sid, "input": question, "clientId": client_id},
     )
+    if not run_resp.get("success") or run_resp.get("errorCode"):
+        print(
+            f"[run_question] run 启动失败: {run_resp.get('errorCode')} "
+            f"{run_resp.get('errorMsg') or run_resp.get('errorMessage')}",
+            file=sys.stderr,
+        )
+        return [], 0.0, ""
     started = time.time()
     tasks = []
     baseline = fetch_answer(sid)
@@ -243,8 +244,8 @@ def main():
         index_rows.append((n, status, round(elapsed), q, os.path.basename(md_path)))
         print(f"  -> {status} {elapsed:.0f}s | answer {len(answer)} chars | sources {len(sources)}", flush=True)
 
-    with open(os.path.join(out_dir, "README.md"), "w", encoding="utf-8") as f:
-        f.write("# 语义通信助手 · 演示问答结果\n\n")
+    with open(os.path.join(out_dir, "qa_index.md"), "w", encoding="utf-8") as f:
+        f.write("# 语义通信助手 · 演示问答结果（自动生成，请勿手改）\n\n")
         f.write("| # | 状态 | 用时 | 问题 | 结果文件 |\n|---|---|---|---|---|\n")
         for n, st, sec, q, fn in index_rows:
             f.write(f"| {n} | {st} | {sec}s | {q} | [{fn}]({fn}) |\n")

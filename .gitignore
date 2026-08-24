@@ -2,3 +2,4 @@
 papers/
 .webbridge/
 __pycache__/
+.env

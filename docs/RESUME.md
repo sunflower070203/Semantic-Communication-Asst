@@ -56,6 +56,26 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
+### 0.5 8/24：P0 完成（凭据安全 + 脚本加固 + 发布自动化 + FC 重试结论）
+- **凭据移出仓库**：三个脚本的 COOKIE/平台地址/agent 标识统一收进 `scripts/config.py`
+  （读环境变量或仓库根 `.env`，`.env` 已 gitignore）；新增 `.env.example`。
+  旧 Cookie 已过期轮换（浏览器 CDP 取新值）。⚠ 仓库 git 历史仍含旧 Cookie 值，
+  若在意可后续做历史清理；平台仅内网可达，风险有限。
+- **三个 P2 修复**：
+  1. `run_question` 检查 `/designer/run` 响应 errorCode，失败立即返回不再烧满超时；
+  2. `kb_upload.py` 注册后校验 `success`，失败抛错并提示清理 minio 对象；
+  3. `run_demo_qa.py` 不再覆盖手维护的 `demo/results/README.md`，表格改写入 `qa_index.md`。
+- **发布链路自动化**：新增 `scripts/deploy_flow.py`（clone→patch→saveProcess→可选 online 一条龙）
+  和 `scripts/flow_patch.py`（补丁逻辑共享模块）；`patch_flow_validation.py` 改为薄封装。
+- **Function Calling 重试结论（P0.3）**：平台工具（数学计算器/夸克搜索/网页解析/文档解析，
+  toolCategory=openTrek，code 如 `10000baseline`）可正常列出、可挂载（/task/add 成功），
+  但运行时工具任务两次实测均后端崩溃：联网搜索(MY_MCP)→`AGENT_TASK_DEFAULT_FAILED`；
+  数学计算器→`taskBeforeConfig is null`。→ **平台工具执行沙箱/运行器后端故障 = 天然约束**，
+  与 8/23 结论一致，Function Calling 深度演示当前不可行，写进策划书风险表。
+- **本次新发现（需注意）**：`/tools/queryPage?toolCategory=openTrek` 返回的平台工具配置里，
+  联网搜索 MCP 工具的 mcpConfig 内嵌了一个 DashScope API Key（个人/平台凭据），
+  **建议尽快在阿里云百炼控制台轮换**（该值未写入本仓库）。
+
 ### 0.4 8/24 凌晨：Agent 化改造完成（引用校验节点 + 确定性 eval）✅
 - **背景**：GAN 对抗审查（docs/agent_self_review.md）判定 B 路线是"RAG 聊天机器人 + 工作流外壳"，
   缺：生成后校验、程序化安全拒绝、确定性评测。
