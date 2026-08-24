@@ -51,6 +51,8 @@ def execute_show_content(params):
         refs = params.refIds or []
     answer_text = (raw or {}).get('answer') or ''
     problems = []
+    if raw is None and not refs:
+        problems.append('总结输出无法解析，未能校验')
     try:
         meta_ids = set()
         for m in (params.all_meta or []):
@@ -80,6 +82,11 @@ def execute_show_content(params):
 ANTI_FABRICATION_LINE = (
     '* 引用的 idx 必须真实存在于"参考内容"中，禁止编造引用、禁止虚构出处；'
     '如果提供的上下文信息不足，直接声明"很抱歉，信息不足";'
+)
+MERMAID_LINE = (
+    '* 如果问题涉及系统架构、处理流程或结构对比（如语义通信系统框架、JSCC 编解码流程），'
+    '请在 answer 末尾附一段 ```mermaid 代码块（flowchart 或 sequenceDiagram 语法）作为图示；'
+    '不适合用图时不要输出 mermaid。'
 )
 PROMPT_ANCHOR = '* 你必须输出符合下方 "输出规范" 部分所述规范的 JSON;'
 
@@ -140,6 +147,8 @@ def build_patched_flow(cfg):
     prompt = summary["data"]["config"]["prompt"]
     if "禁止编造引用" not in prompt:
         prompt = prompt.replace(PROMPT_ANCHOR, ANTI_FABRICATION_LINE + "\n" + PROMPT_ANCHOR)
+    if "mermaid" not in prompt:
+        prompt = prompt.replace(PROMPT_ANCHOR, MERMAID_LINE + "\n" + PROMPT_ANCHOR)
     summary["data"]["config"]["prompt"] = prompt
     return nodes, edges
 

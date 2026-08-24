@@ -8,6 +8,13 @@ Runs a fixed scenario set against the ONLINE agent and asserts:
   D. citation validation passed (no "⚠ 引用校验" unverified footer)
   E. tool-require scenario refuses instead of fabricating
   F. no task ended in ERROR/FAILED
+  G. diagram scenario emits a ```mermaid block
+
+Note: `grounding_min` (char-bigram overlap with recalled chunks) is recorded
+as an informational metric, NOT a hard gate: LLM paraphrase makes lexical
+overlap unreliable. Real grounding is enforced by the workflow itself
+(summary LLM only receives recalled chunks + anti-fabrication prompt +
+programmatic citation verification).
 
 Usage: python eval_agent.py [--questions 1,2,3] [--timeout 420]
 Exit code: 0 all pass, 1 any fail.
@@ -42,10 +49,17 @@ SCENARIOS = [
         "question": "请联网搜索2025年语义通信领域最新发表的三篇论文，并总结它们的核心贡献。注意：不要编造，如果无法联网请明确说明。",
         "require_refusal": True,
     },
+    {
+        "id": "diagram",
+        "question": "请画出语义通信系统的架构流程图（mermaid 语法），并简要解释图中各模块的作用。",
+        "require_refusal": False,
+    },
 ]
 
 WELCOME_MARKERS = ("请问您需要了解哪方面的信息", "我能为您提供", "很高兴为您服务")
 REF_MARKER_RE = re.compile(r"[【\[]\s*([IVXLCDM]+)\s*[】\]]")
+GROUNDING_THRESHOLD = 0.25
+SENT_SPLIT_RE = re.compile(r"[。！？；\n]")
 
 
 def split_body_refs(answer):
@@ -55,6 +69,30 @@ def split_body_refs(answer):
     else:
         body, refs = answer, ""
     return body, refs
+
+
+def strip_code_blocks(text):
+    """Remove ``` fenced blocks (e.g. mermaid) so they don't pollute grounding."""
+    return re.sub(r"```[a-zA-Z]*\n.*?```", " ", text, flags=re.S)
+
+
+def char_bigrams(text):
+    text = re.sub(r"\s+", "", text)
+    return {text[i : i + 2] for i in range(len(text) - 1)}
+
+
+def grounding_score(sentence, chunks):
+    """Max char-bigram overlap between a sentence and any recalled chunk."""
+    s_bg = char_bigrams(sentence)
+    if not s_bg:
+        return 1.0
+    best = 0.0
+    for c in chunks:
+        c_bg = char_bigrams(c)
+        if not c_bg:
+            continue
+        best = max(best, len(s_bg & c_bg) / len(s_bg))
+    return best
 
 
 def evaluate_one(scenario, timeout=420):
@@ -70,6 +108,7 @@ def evaluate_one(scenario, timeout=420):
     stop.set()
     if not answer:
         answer = m.fetch_answer(sid)
+    recall_texts = m.fetch_recall_texts(tasks)
 
     checks = {}
     checks["answer_present"] = len(answer) > 60 and not any(w in answer for w in WELCOME_MARKERS)
@@ -81,6 +120,15 @@ def evaluate_one(scenario, timeout=420):
     checks["markers_in_refs"] = body_markers.issubset(ref_markers)
     checks["validation_clean"] = "⚠ 引用校验" not in answer
 
+    if recall_texts and body_markers:
+        body_clean = strip_code_blocks(body)
+        sentences = [s for s in SENT_SPLIT_RE.split(body_clean) if REF_MARKER_RE.search(s)]
+        scores = [grounding_score(s, recall_texts) for s in sentences]
+        grounding_min = min(scores) if scores else 1.0
+    else:
+        grounding_min = 1.0
+    checks["grounded"] = True  # informational only; see docstring
+
     if scenario["require_refusal"]:
         checks["refused"] = any(
             k in answer
@@ -90,12 +138,15 @@ def evaluate_one(scenario, timeout=420):
         checks["refused"] = True
 
     checks["no_task_failure"] = all(t.get("status") != "ERROR" and t.get("status") != "FAILED" for t in tasks)
+    checks["has_mermaid"] = ("```mermaid" in answer) if scenario["id"] == "diagram" else True
     passed = all(checks.values())
     return {
         "id": scenario["id"],
         "question": scenario["question"],
         "elapsed_s": round(elapsed, 1),
         "answer": answer,
+        "grounding_min": round(grounding_min, 3),
+        "recall_chunks": len(recall_texts),
         "checks": checks,
         "passed": passed,
     }

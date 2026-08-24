@@ -179,6 +179,21 @@ def fetch_recall_sources(tasks):
     return sources
 
 
+def fetch_recall_texts(tasks):
+    """Return all recalled chunk texts (for grounding checks)."""
+    texts = []
+    for t in tasks:
+        if t.get("typeCode") != "KNOWLEDGES_DOC":
+            continue
+        after = t.get("taskAfterTreatmentResult")
+        if isinstance(after, dict) and after.get("data"):
+            for item in after["data"]:
+                text = item.get("chunk_content") or item.get("show_content") or ""
+                if text:
+                    texts.append(text)
+    return texts
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="comma-separated 1-based question indices")

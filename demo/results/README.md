@@ -2,13 +2,20 @@
 
 ## 在线体验链接（B 路线 · 语义通信知识问答）
 
-分享链接（v1.4，含引用校验节点；shareUuid `22ddb3160f3e4847ba90f7b5c4f8fb60`，已启用）：
+分享链接（v1.6，含引用校验 + mermaid 图表输出；shareUuid `297d4be1aa2443cca29b62b5be702beb`，已启用）：
 
 ```
-http://10.128.203.200:30226/agent/index.html#/arrange/agentExp?randomCode=22ddb3160f3e4847ba90f7b5c4f8fb60&noLayout=1
+http://10.128.203.200:30226/agent/index.html#/arrange/agentExp?randomCode=297d4be1aa2443cca29b62b5be702beb&noLayout=1
 ```
 
-> 旧链接（shareUuid `d1e2c75974744be5acceda575766a8bc`）指向已下线的 v1.0，不再使用。
+> 旧链接（shareUuid `22ddb3160f3e4847ba90f7b5c4f8fb60` 指向 v1.4 等）已下线/不再维护。
+
+## 多模态演示：mermaid 图表输出（文本→渲染图）
+
+Agent 在架构/流程类问题中输出 ```mermaid 代码块，平台聊天界面原生渲染为 SVG 流程图
+（已实测：页面中 mermaid 源码块被渲染器消费，聊天区出现 `class="flowchart"` 的 SVG）。
+
+![语义通信系统架构 mermaid 渲染](screenshots/semantic-comms-mermaid-diagram.png)
 
 平台实际运行截图（2026-08-23，问题：什么是语义通信？请结合知识库文献说明，并给出文献来源。）：
 

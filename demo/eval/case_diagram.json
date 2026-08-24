@@ -1,0 +1,19 @@
+{
+ "id": "diagram",
+ "question": "请画出语义通信系统的架构流程图（mermaid 语法），并简要解释图中各模块的作用。",
+ "elapsed_s": 102.0,
+ "answer": "语义通信系统的架构主要包含发射端、信道传输链路与接收端，并深度融合了收发双方共享的背景知识与联合信源信道编码（JSCC）技术 【 I 】。与传统通信仅优化底层传输模块不同，语义通信系统对从原始信源到最终应用目标的全流程进行联合设计，核心目标是缩小传输信号间的语义鸿沟而非单纯降低误码率 【 II 】。图中各核心模块的作用如下：\n- **语义源与同义映射（Semantic Source & Synonymous Mapping）**：生成语义序列并驱动语法信源产生结构化消息，通过映射将抽象含义转化为可被编码器处理的语法格式 【 I 】。\n- **语义/联合编码器（Semantic/JSCC Encoder）**：利用特征提取与神经网络技术将语法消息转换为高维语义特征向量或码字，直接传输对下游任务有用的核心语义信息 【 II 】。\n- **物理与语义信道（Physical & Semantic Channels）**：物理信道负责符号的实际传输并引入噪声、衰落等传统物理损伤；语义信道则描述信息在解析过程中，因理解偏差、上下文缺失或干扰而产生的“语义噪声” 【 III 】。\n- **信道/联合解码器（Channel/JSCC Decoder）**：从受干扰的接收信号中鲁棒地恢复语义特征向量或符号序列 【 I 】。\n- **语义解码器与目的地（Semantic Decoder & Destination）**：结合共享的背景知识对恢复的特征进行重构与逻辑推理，最终还原消息含义并直接驱动下游智能任务或应用执行 【 IV 】。\n\n```mermaid\nflowchart LR\n    subgraph Transmitter [发射端]\n        direction TB\n        SS[语义源 Semantic Source] --> SM[同义映射/语法源 Syntactical Source]\n        SM --> SE[语义/联合编码器 Semantic/JSCC Encoder]\n        SE --> TX[发射信号/特征 Transmitted Symbols]\n        BK_T[(发射端背景知识 Background Knowledge)] -.-> SE\n    end\n\n    TX --> CH{信道传输 Channel}\n    CH -->|符号失真/物理噪声| PHY[物理信道 Physical Channel]\n    CH -->|意义误解/歧义| SEM[语义信道 Semantic Channel]\n    PHY --> RX_SIG[接收信号 Received Signal]\n    SEM -.-> RX_SIG\n\n    subgraph Receiver [接收端]\n        direction TB\n        RX_SIG --> CD[信道/联合解码器 Channel/JSCC Decoder]\n        CD --> SD[语义解码器 Semantic Decoder]\n        SD --> SV[语义目的地 Semantic Destination]\n        SV --> TA[执行任务/推理 Take Action]\n        BK_R[(接收端背景知识 Background Knowledge)] -.-> SD\n    end\n\n    classDef mod fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;\n    classDef ch fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;\n    classDef bk fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,stroke-dasharray: 5 5;\n    class SS,SM,SE,CD,SD,SV,TA mod;\n    class PHY,SEM ch;\n    class BK_T,BK_R bk;\n```\n----\n\n I. 《B. Semantic Communication System》中的系统框图、同义映射与编解码基础定义\n II. 《II. SEMANTIC COMMUNICATION MODEL AND SYNONYMOUS MAPPING》中的信号流向与特征编码流程\n III. 《A. Semantic Communication System Components》中的物理信道与语义信道划分及噪声说明\n IV. 参考文献对比说明：传统系统与语义系统联合设计及任务导向差异",
+ "grounding_min": 0.119,
+ "recall_chunks": 10,
+ "checks": {
+  "answer_present": true,
+  "no_flow_error": true,
+  "markers_in_refs": true,
+  "validation_clean": true,
+  "grounded": true,
+  "refused": true,
+  "no_task_failure": true,
+  "has_mermaid": true
+ },
+ "passed": true
+}

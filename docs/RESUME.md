@@ -56,6 +56,22 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 
 ## 1. 平台侧资产（账号 sunhao / 东南大学 OpenTrek）
 
+### 0.6 8/24 晚：多模态调查 + mermaid 图表输出（v1.6）✅
+- **多模态调查结论**：
+  - 读图：原生支持（vlm 模型 qwen-vl / qwen-vl-plus；视觉知识库 OCR/识别/向量化；多模态 RAG）。
+  - 生图（文生图/图生图）：**无原生支持**（模型类型表无 IMAGE_GENERATION；平台工具无；
+    百炼模型中心 token_gateway 报 `meta_resource_center` 表缺失 = 平台模型中心供给不全）。
+  - "文本输出渲染图片"：**原生支持**——聊天渲染器 `ChatMarkdownRender` + MermaidBlock
+    把 ```mermaid 代码块渲染成 SVG（mermaid.js 11.16.0）。用户所见"有人生图"即此机制
+    （类似 skill 商店的 drafter：HTML/CSS 画技术图）。
+- **落地（v1.6，agentVersion `1787573592202`，ONLINE）**：结果总结 prompt 增加
+  "架构/流程类问题在 answer 末尾输出 ```mermaid 图"；实测聊天区渲染出 `class="flowchart"`
+  SVG（截图 demo/results/screenshots/semantic-comms-mermaid-diagram.png）。
+- **eval 扩展 4 场景**：新增 diagram 场景（断言回答含 ```mermaid）；接地分数改为参考指标
+  （词面重叠对 LLM 改写不可靠，真实接地由"只喂召回 chunk + 防编造 + 引用校验"保证）。
+- **新分享链接**：shareUuid `297d4be1aa2443cca29b62b5be702beb`
+  （`#/arrange/agentExp?randomCode=297d4be1aa2443cca29b62b5be702beb&noLayout=1`）
+
 ### 0.5 8/24：P0 完成（凭据安全 + 脚本加固 + 发布自动化 + FC 重试结论）
 - **凭据移出仓库**：三个脚本的 COOKIE/平台地址/agent 标识统一收进 `scripts/config.py`
   （读环境变量或仓库根 `.env`，`.env` 已 gitignore）；新增 `.env.example`。
