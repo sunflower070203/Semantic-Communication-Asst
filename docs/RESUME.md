@@ -63,6 +63,11 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
 - 新增根目录 `README.md`（开源高质量规范：特性/架构图/快速开始/目录/评测/平台约束/演示/文档）。
 - 交付物清单：策划书 ✅ 技术报告 ✅ 线上链接 ✅ 源码脚本 ✅ README ✅；
   **Demo 视频 ❌（待录制，8/31 截止）**。
+- 8/26 晚：plan_book.md 用 human-writing/ljg-writes/Karpathy 视角重写为硬核企业级版本
+  （check_prose 违禁项清零，2279 字），并转出提交版
+  `docs/submission/语义通信助手_项目策划书与设计方案.pdf/docx`（4 页）、
+  `docs/submission/语义通信助手_技术报告.pdf/docx`（5 页）；
+  转换器 `scripts/md_to_docx_pdf.py`（python-docx + reportlab，STSong 中文字体）。
 
 ### 0.6 8/24 晚：多模态调查 + mermaid 图表输出（v1.6）✅
 - **多模态调查结论**：
