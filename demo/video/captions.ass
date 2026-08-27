@@ -1,0 +1,21 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1440
+PlayResY: 900
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Microsoft YaHei,46,&H00FFFFFF,&H000000FF,&H00101010,&H96000000,-1,0,0,0,100,100,0,0,1,3,1,2,80,80,70,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:23.19,Cap,,0,0,0,,语义通信助手 · AI+ 大赛赛道一
+Dialogue: 0,0:00:25.19,0:00:56.00,Cap,,0,0,0,,结构化回答 · 引用标记 [I] · 引用列表
+Dialogue: 0,0:00:58.00,0:01:39.00,Cap,,0,0,0,,引用校验 · 三方核对 · 本回答引用全部通过
+Dialogue: 0,0:01:41.00,0:02:20.80,Cap,,0,0,0,,Mermaid → 流程图 · 矢量渲染
+Dialogue: 0,0:02:22.80,0:02:51.60,Cap,,0,0,0,,能力边界 · 明确拒绝 · 不编造
+Dialogue: 0,0:02:53.60,0:03:41.60,Cap,,0,0,0,,10/10 论文解析 · 4 场景评测全绿 · 6 个单元测试
+Dialogue: 0,0:03:43.60,0:03:54.60,Cap,,0,0,0,,现场提问 · 6G 应用场景
+Dialogue: 0,0:03:56.60,0:04:07.10,Cap,,0,0,0,,实时回答 · 引用可追溯
