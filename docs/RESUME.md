@@ -1,9 +1,26 @@
 # 语义通信助手 — 进度恢复文档
 
-> 最后更新：2026-08-23 19:30（Asia/Shanghai）
+> 最后更新：2026-08-27 22:00（Asia/Shanghai）
 > 用途：平台会话中断后，按此文档恢复全部进度。所有关键标识符和待办在此记录。
 
 ## 0. 重大进展（A 路线：角色对话 Agent 已验证可自主运行）
+
+### 0.8 8/27：专家 Skill 沉淀 + v1.7（语义通信知识问答）
+- **创建"语义通信专家" skill 成功**（平台 Skills Hub → 空间Skills）：
+  - name `semantic-communication-expert`，skillCode `136d36c7-a5ad-4e23-98a0-985279747585`，v `1787836922711`
+  - 结构：SKILL.md（frontmatter: name/version/description/description_zh/category/allowed-tools）
+    + .skill-metadata.yaml（examples）+ references/（terminology.md、paper_list.md）
+  - 源码在仓库 `skills/semantic-communication-expert/`；API 链：`getSkillMediaOSSPolicyByName`
+    （拿预签名 PUT，**必须传完整签名 URL 给 scanZip**）→ `scanZip` → `create`
+- **平台限制（重要，评审备问）**：工作流型 agent 配置无 `trekClawSkillList` 字段，
+  `skill/updateTrekAgentVersion` 绑定报 `No trekClawSkillList found in agent config`；
+  skill 是 TrekClaw 型 agent（Designer 聊天组件）的能力，工作流型结构上不支持。
+  → **落地方式**：把 skill 的专家规范（术语中英对照、Deep JSCC/DeepSC 区分、回答自查维度）
+    注入工作流"结果总结"节点 prompt（`scripts/patch_skill_prompt.py`），行为等价、平台兼容。
+- **v1.7（agentVersion `1787836399246`，原名 skill-test，已改名）ONLINE**，v1.6 已下线；
+  4 场景评测全绿（concept/multistep/tool_require/diagram），分享链接 `297d4be1aa2443cca29b62b5be702beb`
+  实测走 v1.7 回答正常（连续快速提问仍可能触发平台串行流 human-stop/UNKNOWN_EXCEPTION，旧现象）。
+- `.env` 的 `OPENTREK_AGENT_VERSION` 已更新为 `1787836399246`。
 
 **语义通信自主Agent3 是当前主资产**：角色对话型、AutoBotV2、processAgentEngine/ReAct、
 qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真实运行并给出高质量回答**

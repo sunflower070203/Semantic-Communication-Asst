@@ -1,9 +1,9 @@
 {
  "id": "tool_require",
  "question": "请联网搜索2025年语义通信领域最新发表的三篇论文，并总结它们的核心贡献。注意：不要编造，如果无法联网请明确说明。",
- "elapsed_s": 112.3,
- "answer": "很抱歉，信息不足。作为人工智能模型，我目前无法直接联网检索实时更新的学术文献，且提供的参考资料均集中于2020至2023年的语义通信基础研究阶段，未包含2025年最新发表的论文 【I】。为补充相关主题内容，以下基于现有资料总结语义通信领域的核心演进与代表性贡献：\n1. **鲁棒文本语义通信系统（R-DeepSC）**：首次系统性地探索了文本传输中的字面语义噪声与对抗性语义噪声，提出结合校准自注意力机制与新型损失函数及对抗训练的架构，有效消除了语义层面的传输误差 【II】。\n2. **语义通信统一理论框架**：将通信核心抽象为包含语义编码器、语义解码器与共享知识库的“语义语言”，并将关键挑战划分为“语言利用”（在固定组件下缓解收发端差异）与“语言设计”（为特定信源从头设计高效语言）两大方向 【III】。\n3. **系统架构与性能度量**：明确了背景知识、语义/信道编解码器等核心组件，指出其优化目标已从传统通信的降低误码率转向缩小收发信号间的“语义鸿沟”，主要适用于智能体间（M2M/H2M）通信 【IV】。\n\n附语义通信系统基础架构与数据流图示：\n```mermaid\nflowchart LR\n    subgraph Tx [发送端 Transmitter]\n        SK[Background Knowledge] --> SE[Semantic Encoder]\n        SE --> CE[Channel Encoder]\n    end\n    subgraph Ch [传输信道 Channels]\n        CE --> PC[Physical Channel]\n        PC --> SC[Semantic Channel]\n    end\n    subgraph Rx [接收端 Receiver]\n        SC --> CD[Channel Decoder]\n        CD --> SD[Semantic Decoder]\n    end\n    SK -. Shared Knowledge Base .-> SD\n```\n*注：如需获取2025年最新研究成果，建议前往IEEE Xplore、arXiv或Google Scholar平台使用“Semantic Communication”、“Semantic-empowered 6G”等关键词进行实时检索。*\n----\n\n I. 参考文献列表中截至2023年的语义通信相关文献集合\n II. 《A Robust Deep Learning Enabled Semantic Communication System for Text》中对抗语义噪声的消除方法\n III. 语义通信通用框架中的“语义语言”定义及语言利用/设计挑战\n IV. 语义通信系统核心组件架构与语义鸿沟优化目标",
- "grounding_min": 0.066,
+ "elapsed_s": 81.5,
+ "answer": "很抱歉，信息不足。由于当前运行环境无法联网检索实时数据库，我无法为您提供2025年最新发表的三篇论文。基于提供的参考资料，语义通信（Semantic Communication）领域近年的核心研究进展与学术贡献主要集中在以下三个方向：\n\n1. 系统架构与组件规范：研究确立了包含语义编码器、信道编码器、语义解码器及信道解码器的标准传输链路，并强调收发端共享的背景知识库是实现高语义保真度（Semantic Fidelity）的基础支撑 【 III 】。\n2. 语义噪声建模与鲁棒传输：针对文本语义传输中特有的语义噪声（Semantic Noise），学者提出了R-DeepSC等深度学习系统，通过引入校准自注意力机制与对抗训练策略，显著提升了系统在字面错误与对抗性干扰下的鲁棒性 【 I 】。\n3. 语义语言理论与任务导向范式：研究构建了以“语义语言”为核心的通用框架，将语义通信的核心挑战划分为语言设计（Language Design）与语言利用（Language Exploitation）。该理论为提示工程、大模型交互以及任务导向通信（Task-Oriented Communication）中的联合信源信道编码（JSCC）优化提供了底层逻辑 【 II 】。\n\n如需获取2025年最新文献数据，建议直接访问 arXiv、IEEE Xplore 或 ACM Digital Library 等学术平台进行实时检索。\n----\n\n I. 《A Robust Deep Learning Enabled Semantic Communication System for Text》中的R-DeepSC架构与语义噪声消除机制\n II. 语义通信通用框架中的“语义语言”定义、语言利用与语言设计挑战\n III. 语义通信系统主要组件结构（语义/信道编解码器与物理/语义信道）及背景知识作用",
+ "grounding_min": 0.243,
  "recall_chunks": 10,
  "checks": {
   "answer_present": true,

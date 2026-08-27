@@ -1,0 +1,57 @@
+examples:
+  - id: semantic-comms-vs-traditional
+    title:
+      zh: 语义通信与传统通信的区别
+      en: Semantic Communication vs Traditional Communication
+    description:
+      zh: 从传输目标、编解码机制、系统设计范围三个维度解释语义通信与传统通信的本质区别
+      en: Explain the essential differences between semantic and traditional communication from three dimensions
+    prompt:
+      zh: |-
+        请解释什么是语义通信，它和传统通信有什么区别？
+
+        要求：
+        1. 先给出语义通信的定义，再对比区别
+        2. 每条关键陈述都标注引用标记【I】【II】...
+        3. 末尾附引用列表，注明出自哪篇论文
+        4. 如果涉及系统框架，用 mermaid 画出对比图
+      en: |-
+        Please explain what semantic communication is and how it differs from traditional communication.
+
+        Requirements:
+        1. Define semantic communication first, then contrast with traditional communication
+        2. Mark every key statement with citation markers [I][II]...
+        3. Append a citation list with paper sources at the end
+        4. Use a mermaid diagram for the system comparison if applicable
+  - id: deepjscc-vs-deepsc
+    title:
+      zh: Deep JSCC 与 DeepSC 的区别
+      en: Deep JSCC vs DeepSC
+    description:
+      zh: 对比 Deep JSCC 与 DeepSC 在数据模态、网络架构、损失函数与评估指标上的差异
+      en: Compare Deep JSCC and DeepSC across data modality, network architecture, loss functions, and evaluation metrics
+    prompt:
+      zh: |-
+        Deep JSCC 和 DeepSC 有什么区别？
+
+        从数据模态、网络架构、损失函数与评估指标、优化目标四个方面对比，并附引用标记与引用列表。
+      en: |-
+        What is the difference between Deep JSCC and DeepSC?
+
+        Compare across data modality, network architecture, loss function & evaluation metrics, and optimization objectives, with citation markers and a reference list.
+  - id: semantic-comms-in-6g
+    title:
+      zh: 语义通信在 6G 中的应用
+      en: Semantic Communication Applications in 6G
+    description:
+      zh: 梳理语义通信在工业物联网、智能交通、AR/VR 与智能体通信等 6G 场景中的应用
+      en: Survey semantic communication applications in 6G scenarios including IIoT, intelligent transportation, AR/VR, and agent communication
+    prompt:
+      zh: |-
+        语义通信在 6G 里有哪些典型应用场景？
+
+        列出主要应用场景，说明每个场景为什么适合语义通信，并附引用标记与引用列表。
+      en: |-
+        What are the typical application scenarios of semantic communication in 6G?
+
+        List the main scenarios, explain why semantic communication fits each, and include citation markers and a reference list.
