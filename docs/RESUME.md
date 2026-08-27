@@ -68,6 +68,10 @@ qwen3.6-plus + 角色定义Prompt + 约束条件Prompt，**已在调试面板真
   `docs/submission/语义通信助手_项目策划书与设计方案.pdf/docx`（4 页）、
   `docs/submission/语义通信助手_技术报告.pdf/docx`（5 页）；
   转换器 `scripts/md_to_docx_pdf.py`（python-docx + reportlab，STSong 中文字体）。
+- 8/27：Demo 视频改为**用户自行录屏**（webbridge 截图不稳定 + 滚动不同步，自动化录屏弃用）。
+  - 清理：demo/video 失败产物、record_demo.py / build_demo_slideshow.py、临时 ffmpeg 已删除。
+  - 保留 `scripts/prepopulate_share.py`：录屏前预填分享会话 4 个问答（UI 驱动，约 8 分钟），
+    用户录屏时直接滚动展示 + 现场问 1 个新问题即可。配套口语脚本 docs/demo_script.md。
 
 ### 0.6 8/24 晚：多模态调查 + mermaid 图表输出（v1.6）✅
 - **多模态调查结论**：
